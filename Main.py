@@ -120,6 +120,13 @@ class team:
     def __init__(self) -> None:
         self.build = True
 
+class tower:
+    def __init__(self):
+        self.unittype='tower'
+        self.hpbar = 150
+        self.hp = 1500
+        self.pos = [width/2+10,hieght/2+10]
+
 backgrounds = [background([0,0]),background([-width+20,-hieght+20]),background([width-20,-hieght+20]),background([-width+20,hieght-20]),background([width-20,hieght-20]),background([0,-hieght+20]),background([width-20,0]),background([-width+20,0]),background([0,hieght-20])]
 map_hidders = []  
 map_hidders_destroyed = []  
@@ -131,12 +138,13 @@ destroyed_bullets = []
 walls = []
 men = []
 dead = []
-buildings = [picbuildingfspsgen([10,10],'m'),picbuildingfspsgen([width-20-(width)/20,10],'e'),buildingsoldiergen([200,200],'e1',(255,255,0)),buildingsoldiergen([300,300],'e2',(255,0,255))]
+buildings = [picbuildingfspsgen([10,10],'m'),picbuildingfspsgen([width-20-(width)/20,10],'e'),buildingsoldiergen([200,200],'e1',(255,255,0)),buildingsoldiergen([700,700],'e2',(255,0,255))]
 count = 0
 clicked_on_fs_ps_gen = False
 # die_sound = pygame.mixer.Sound()
 # flame_sound = pygame.mixer.Sound()
 shot_sound = pygame.mixer.Sound('gunshot.mp3')
+the_tower = tower()
 # n = 1
 def scrolling_screen(n1,n2):
     for i in men:
@@ -154,11 +162,13 @@ def scrolling_screen(n1,n2):
         i.pos[1]+=n2
     placeofrightclick[0]+=n1
     placeofrightclick[1]+=n2
+    the_tower.pos[0]+=n1
+    the_tower.pos[1]+=n2
 
-money1 = 1000
-money2 = 1000
-money3 = 1000
-money4 = 1000
+money1 = 100000
+money2 = 100000
+money3 = 100000
+money4 = 100000
 build1 = True
 build2 = True
 build3 = True
@@ -245,7 +255,7 @@ while True:
         if event.type == pygame.KEYDOWN:
             mouse = pygame.mouse.get_pos()
             for i in buildings:
-                if i.pos[0] - mouse[0] > -175 and i.pos[0] - mouse[0] < 0 and i.pos[1] - mouse[1] > -175 and i.pos[1] - mouse[1] < 0 and money1 >= 50 and i.unittype==['fs','ps','t'] and i.side == 'm':
+                if i.pos[0] - mouse[0] > -(width-20)/20 and i.pos[0] - mouse[0] < 0 and i.pos[1] - mouse[1] > -(width-20)/20 and i.pos[1] - mouse[1] < 0 and money1 >= 50 and i.unittype==['fs','ps','t'] and i.side == 'm':
                     if event.key == pygame.K_f:
                         i.spawnfs = True
                         done = True
@@ -276,7 +286,32 @@ while True:
                         if event.type == pygame.MOUSEBUTTONDOWN:
                             buildings.append(buildingsoldiergen(list(pygame.mouse.get_pos()),'m',(0,0,255)))
                             done = True
-            
+                    mouse = pygame.mouse.get_pos()
+                    scroll = True
+                    for i in backgrounds:
+                        if i.pos[0] < -3*width-(i.pos[0]+width)+1:
+                            scrolling_screen(1,0)
+                            scroll = False
+                        if i.pos[0] > 3*width-(i.pos[0]-width)-1:
+                            scrolling_screen(-1,0)
+                            scroll = False
+                        if i.pos[1] < -3*hieght-(i.pos[1]+hieght)+1:
+                            scrolling_screen(0,1)
+                            scroll = False
+                        if i.pos[1] > 3*hieght-(i.pos[1]-hieght)-1:
+                            scrolling_screen(0,-1)
+                            scroll = False
+
+                    if scroll == True:
+                        if mouse[0] < width/26:
+                            scrolling_screen(40,0)
+                        if mouse[0] > -width/26+width:
+                            scrolling_screen(-40,0)
+                        if mouse[1] < hieght/14:
+                            scrolling_screen(0,40)
+                        if mouse[1] > -hieght/14+hieght:
+                            scrolling_screen(0,-40)
+
             if clicked[0] > 0 and clicked[0] < (width-20)/20 and clicked[1] > 0 and clicked[1] < (width-20)/20 and money2 >= 300:
                 done = False
                 money2-=300
@@ -426,9 +461,9 @@ while True:
                     canshoot = False
                     cantattack=None
                     target_picked = True
+
                     
             if i.side != 'm' and i.pos[0] - j.pos[0] > -700 and i.pos[0] - j.pos[0] < 700 and i.pos[1] - j.pos[1] > -700 and i.pos[1] - j.pos[1] < 700 and i.side != j.side and target_picked == False and i.move == True:
-                target_picked = True
                 dx = j.pos[0]-50 - i.pos[0]
                 dy = j.pos[1]-50 - i.pos[1]
                 distance = (dx**2 + dy**2)**0.5
@@ -450,6 +485,8 @@ while True:
                     i.pos[1] += i.speed * dy / distance
                     # i.originalpos[0] += 15 * dx / distance
                     # i.originalpos[0] += 15 * dx / distance
+                
+
 
             if i.pos[0] - j.pos[0] > -100 and i.pos[0] - j.pos[0] < 100 and i.pos[1] - j.pos[1] > -100 and i.pos[1] - j.pos[1] < 100 and i.side != j.side and i.side == 'm' and target_picked == False and i.move == True:
                 target_picked = True
@@ -464,6 +501,37 @@ while True:
                     i.pos[0] += i.speed * dx / distance
                     i.pos[1] += i.speed * dy / distance
             count_for_men_place2+=1
+
+        towertarget = True
+        ls = [men[0].side]
+        for n in men:
+            if n.side not in ls:
+                towertarget = False
+            ls.append(n.side)
+
+        if towertarget ==True:
+                dx = the_tower.pos[0]-50 - i.pos[0]
+                dy = the_tower.pos[1]-50 - i.pos[1]
+                distance = (dx**2 + dy**2)**0.5
+
+                if distance <= i.speed:
+                    pass
+                    # i.originalpos[0] = j.pos[0]
+                    # i.originalpos[1] = j.pos[1]
+                else:
+                    if i.speed * dx / distance < 0 and i.unittype != 't':
+                        if i.direction == "R":
+                            i.direction = "L"
+                            i.im = pygame.transform.flip(i.im,1,0)
+                    if i.speed * dx / distance >= 0 and i.unittype != 't':
+                        if i.direction == "L":
+                            i.direction = "R"
+                            i.im = pygame.transform.flip(i.im,1,0)
+                    i.pos[0] += i.speed * dx / distance
+                    i.pos[1] += i.speed * dy / distance
+                    # i.originalpos[0] += 15 * dx / distance
+                    # i.originalpos[0] += 15 * dx / distance
+
         # if count%10 == 0:
         #     n*=-1
         # i.pos[0]+=n
@@ -501,4 +569,5 @@ while True:
     #         if j.pos[0] - map_hidders[i].pos[0] < 400 and j.pos[0] - map_hidders[i].pos[0] > -400 and j.pos[1] - map_hidders[i].pos[1] < 400 and j.pos[1] - map_hidders[i].pos[1] > -400 and j.side == 'm':
     #             which_to_disapear.append(i)
     #     wn.blit(map_hidders[i].im,map_hidders[i].pos)
+    pygame.draw.rect(wn,(255,125,60),[the_tower.pos[0],the_tower.pos[1],100,200])
     pygame.display.flip()
