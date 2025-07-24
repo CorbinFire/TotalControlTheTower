@@ -255,7 +255,7 @@ while True:
         if event.type == pygame.KEYDOWN:
             mouse = pygame.mouse.get_pos()
             for i in buildings:
-                if i.pos[0] - mouse[0] > -(width-20)/20 and i.pos[0] - mouse[0] < 0 and i.pos[1] - mouse[1] > -(width-20)/20 and i.pos[1] - mouse[1] < 0 and money1 >= 50 and i.unittype==['fs','ps','t'] and i.side == 'm':
+                if i.pos[0] - mouse[0] > -175 and i.pos[0] - mouse[0] < 0 and i.pos[1] - mouse[1] > -175 and i.pos[1] - mouse[1] < 0 and money1 >= 50 and i.unittype==['fs','ps','t'] and i.side == 'm':
                     if event.key == pygame.K_f:
                         i.spawnfs = True
                         done = True
@@ -546,5 +546,4 @@ while True:
     #         if j.pos[0] - map_hidders[i].pos[0] < 400 and j.pos[0] - map_hidders[i].pos[0] > -400 and j.pos[1] - map_hidders[i].pos[1] < 400 and j.pos[1] - map_hidders[i].pos[1] > -400 and j.side == 'm':
     #             which_to_disapear.append(i)
     #     wn.blit(map_hidders[i].im,map_hidders[i].pos)
-    pygame.draw.rect(wn,(255,125,60),[the_tower.pos[0],the_tower.pos[1],100,200])
     pygame.display.flip()
